@@ -48,29 +48,43 @@
 #define IN_CHANNELS 1
 #define OUT_CHANNELS 1
 #define IN_DIM 256
+#define IN_ROW_DIM IN_DIM
+#define IN_COL_DIM IN_DIM
 #if CONV == 1
 #define KERNEL_DIM 3
 #define OUT_DIM 254
+#define OUT_ROW_DIM OUT_DIM
+#define OUT_COL_DIM OUT_DIM
 
 #elif CONV == 2
 #define KERNEL_DIM 5
 #define OUT_DIM 252
+#define OUT_ROW_DIM OUT_DIM
+#define OUT_COL_DIM OUT_DIM
 
 #elif CONV == 3
 #define KERNEL_DIM 7 
 #define OUT_DIM 250
+#define OUT_ROW_DIM OUT_DIM
+#define OUT_COL_DIM OUT_DIM
 
 #elif CONV == 4
 #define KERNEL_DIM 9 
 #define OUT_DIM 248
+#define OUT_ROW_DIM OUT_DIM
+#define OUT_COL_DIM OUT_DIM
 
 #elif CONV == 5
 #define KERNEL_DIM 11 
 #define OUT_DIM 246 
+#define OUT_ROW_DIM OUT_DIM
+#define OUT_COL_DIM OUT_DIM
 
 #elif CONV == 6 
 #define KERNEL_DIM 13 
 #define OUT_DIM 244
+#define OUT_ROW_DIM OUT_DIM
+#define OUT_COL_DIM OUT_DIM
 #endif
 #endif
 
@@ -81,7 +95,12 @@
 #define OUT_CHANNELS 0
 #define KERNEL_DIM 0
 #define IN_DIM 0
-#define OUT_DIM 0
+#define IN_ROW_DIM 0
+#define IN_COL_DIM 0
+#define OUT_ROW_DIM 0
+#define OUT_COL_DIM 0
+// #define OUT_DIM 0
+
 #endif
 
 static uint64_t read_cycles() {
@@ -116,13 +135,17 @@ int main() {
   }
 
   if (CONV) {
-    static elem_t input[BATCH_SIZE][IN_DIM][IN_DIM][IN_CHANNELS];
+    static elem_t input[BATCH_SIZE][IN_ROW_DIM][IN_COL_DIM][IN_CHANNELS];
+    // static elem_t input[BATCH_SIZE][IN_DIM][IN_DIM][IN_CHANNELS];
     static elem_t weights[IN_CHANNELS * KERNEL_DIM * KERNEL_DIM][OUT_CHANNELS];
     static acc_t bias[OUT_CHANNELS];
-    static elem_t output[BATCH_SIZE * OUT_DIM * OUT_DIM][OUT_CHANNELS];
+    static elem_t output[BATCH_SIZE * OUT_ROW_DIM * OUT_COL_DIM][OUT_CHANNELS];
+    // static elem_t output[BATCH_SIZE * OUT_DIM * OUT_DIM][OUT_CHANNELS];
     for (size_t n = 0; n < BATCH_SIZE; n++)
-      for (size_t h = 0; h < IN_DIM; h++)
-        for (size_t w = 0; w < IN_DIM; w++)
+      // for (size_t h = 0; h < IN_DIM; h++)
+      //   for (size_t w = 0; w < IN_DIM; w++)
+      for (size_t h = 0; h < IN_ROW_DIM; h++)
+        for (size_t w = 0; w < IN_COL_DIM; w++)
           for (size_t c = 0; c < IN_CHANNELS; c++)
             input[n][h][w][c] = 1;
 
@@ -131,7 +154,8 @@ int main() {
         weights[i][j] = 1;
 
     uint64_t start = read_cycles();
-    tiled_conv_auto(BATCH_SIZE, IN_DIM, IN_CHANNELS, OUT_CHANNELS, OUT_DIM,
+    tiled_conv_auto(BATCH_SIZE, IN_ROW_DIM, IN_COL_DIM, IN_CHANNELS, OUT_CHANNELS, OUT_ROW_DIM, OUT_COL_DIM,
+    // tiled_conv_auto(BATCH_SIZE, IN_DIM, IN_CHANNELS, OUT_CHANNELS, OUT_DIM,
                     /*stride=*/1, 1, 1, /*padding=*/0, KERNEL_DIM, false, false,
                     false, false, false, (elem_t *)input, (elem_t *)weights,
                     (acc_t *)bias, (elem_t *)output, NO_ACTIVATION,

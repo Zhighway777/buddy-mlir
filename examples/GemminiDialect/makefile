@@ -3,6 +3,7 @@ BUDDY_OPT := ../../build/bin/buddy-opt
 BUDDY_TRANSLATE := ../../build/bin/buddy-translate
 BUDDY_LLC := ../../build/bin/buddy-llc
 INTERFACES:= ../../frontend/Interfaces
+PK := /opt/riscv/riscv64-unknown-elf/bin/pk
 
 mvin-mvout-lower:
 	@${BUDDY_OPT} ./mvin-mvout.mlir \
@@ -30,7 +31,7 @@ mvin-mvout-run:
 		-mattr=+buddyext,+D -float-abi=hard \
 		-o log.o
 	@riscv64-unknown-linux-gnu-gcc log.o -O2 -static -o a.out
-	@spike --extension=gemmini pk a.out
+	@spike --extension=gemmini /opt/riscv/riscv64-unknown-elf/bin/pk a.out
 
 matrix-add-lower:
 	@${BUDDY_OPT} ./matrix-add.mlir \
@@ -338,7 +339,7 @@ tile-matmul-ws-softmax-run:
 		-mattr=+buddyext,+D -float-abi=hard \
 		-o log.o
 	@riscv64-unknown-linux-gnu-gcc log.o -O2 -static -o a.out
-	@spike --extension=gemmini pk a.out
+	@spike --extension=gemmini ${PK} a.out
 
 tile-matmul-ws-layernorm-lower:
 	@${BUDDY_OPT} ./tile-matmul-ws-layernorm.mlir \
@@ -760,7 +761,7 @@ gemmini-linalg-batch-matmul-run:
 		-mattr=+buddyext,+D -float-abi=hard \
 		-o log.o
 	@riscv64-unknown-linux-gnu-gcc log.o -O2 -static -o a.out
-	@spike --extension=gemmini pk a.out
+	@spike --extension=gemmini ${PK} a.out
 
 linalg-matmul-32x32-gemmini-lower:
 	@${BUDDY_OPT} ./ciface.mlir \
@@ -801,15 +802,15 @@ linalg-matmul-32x32-gemmini-run:
 		-mattr=+buddyext,+D -float-abi=hard \
 		-o log.o
 	@riscv64-unknown-linux-gnu-g++ log.o -DMATMUL=1 -DDIALECT=1 \
-	performance-test.cpp -O2 -static -o a.out -I${INTERFACES}
-	@spike --extension=gemmini pk a.out
+	performance-test-simple.cpp -O2 -static -o a.out -I${INTERFACES}
+	@spike --extension=gemmini /opt/riscv/riscv64-unknown-elf/bin/pk a.out
 
 c-matmul-32x32-gemmini-run:
 	@riscv64-unknown-linux-gnu-gcc performance-test.c \
-	-I${RISCV}/../../generators/gemmini/software/gemmini-rocc-tests/include \
-	-I${RISCV}/../../generators/gemmini/software/gemmini-rocc-tests  \
+	-I/zhw/chipyard/generators/gemmini/software/gemmini-rocc-tests/include \
+	-I/zhw/chipyard/generators/gemmini/software/gemmini-rocc-tests  \
 	-DMATMUL=1 -O2 -static
-	@spike --extension=gemmini pk a.out
+	@spike --extension=gemmini /opt/riscv/riscv64-unknown-elf/bin/pk a.out
 
 linalg-matmul-32x32-cpu-lower:
 	@${BUDDY_OPT} ./ciface.mlir \
@@ -862,9 +863,9 @@ linalg-matmul-32x32-cpu-run:
 		-mattr=+buddyext,+D -float-abi=hard \
 		-o log.o
 	@riscv64-unknown-linux-gnu-g++ log.o -DMATMUL=1 \
-	-DDIALECT=1 performance-test.cpp \
+	-DDIALECT=1 performance-test-simple.cpp \
 	-O2 -static -o a.out -I${INTERFACES}
-	@spike --extension=gemmini pk a.out
+	@spike --extension=gemmini ${PK} a.out
 
 gemmini-matmul-32x32-gemmini-lower:
 	@${BUDDY_OPT} ./ciface.mlir \
@@ -901,9 +902,9 @@ gemmini-matmul-32x32-gemmini-run:
 		-mattr=+buddyext,+D -float-abi=hard \
 		-o log.o
 	@riscv64-unknown-linux-gnu-g++ log.o -DMATMUL=1 \
-	-DDIALECT=2	performance-test.cpp \
+	-DDIALECT=2	performance-test-simple.cpp \
 	-O2 -static -o a.out -I${INTERFACES}
-	@spike --extension=gemmini pk a.out
+	@spike --extension=gemmini ${PK} a.out
 
 linalg-matmul-64x64-gemmini-lower:
 	@${BUDDY_OPT} ./ciface.mlir \
@@ -944,7 +945,7 @@ linalg-matmul-64x64-gemmini-run:
 		-mattr=+buddyext,+D -float-abi=hard \
 		-o log.o
 	@riscv64-unknown-linux-gnu-g++ log.o -DMATMUL=2 -DDIALECT=1 \
-	performance-test.cpp -O2 -static -o a.out -I${INTERFACES}
+	performance-test-simple.cpp -O2 -static -o a.out -I${INTERFACES}
 	@spike --extension=gemmini pk a.out
 
 c-matmul-64x64-gemmini-run:
@@ -952,7 +953,7 @@ c-matmul-64x64-gemmini-run:
 	-I${RISCV}/../../generators/gemmini/software/gemmini-rocc-tests/include \
 	-I${RISCV}/../../generators/gemmini/software/gemmini-rocc-tests  \
 	-DMATMUL=2 -O2 -static
-	@spike --extension=gemmini pk a.out
+	@spike --extension=gemmini ${PK} a.out
 
 linalg-matmul-64x64-cpu-lower:
 	@${BUDDY_OPT} ./ciface.mlir \
@@ -1005,7 +1006,7 @@ linalg-matmul-64x64-cpu-run:
 		-mattr=+buddyext,+D -float-abi=hard \
 		-o log.o
 	@riscv64-unknown-linux-gnu-g++ log.o -DMATMUL=2 \
-	-DDIALECT=1 performance-test.cpp \
+	-DDIALECT=1 performance-test-simple.cpp \
 	-O2 -static -o a.out -I${INTERFACES}
 	@spike --extension=gemmini pk a.out
 
@@ -1044,7 +1045,7 @@ gemmini-matmul-64x64-gemmini-run:
 		-mattr=+buddyext,+D -float-abi=hard \
 		-o log.o
 	@riscv64-unknown-linux-gnu-g++ log.o -DMATMUL=2 \
-	-DDIALECT=2	performance-test.cpp \
+	-DDIALECT=2	performance-test-simple.cpp \
 	-O2 -static -o a.out -I${INTERFACES}
 	@spike --extension=gemmini pk a.out
 
@@ -1087,8 +1088,8 @@ linalg-matmul-128x128-gemmini-run:
 		-mattr=+buddyext,+D -float-abi=hard \
 		-o log.o
 	@riscv64-unknown-linux-gnu-g++ log.o -DMATMUL=3 -DDIALECT=1 \
-	performance-test.cpp -O2 -static -o a.out -I${INTERFACES}
-	@spike --extension=gemmini pk a.out
+	performance-test-simple.cpp -O2 -static -o a.out -I${INTERFACES}
+	@spike --extension=gemmini /opt/riscv/riscv64-unknown-elf/bin/pk a.out
 
 c-matmul-128x128-gemmini-run:
 	@riscv64-unknown-linux-gnu-gcc performance-test.c \
@@ -1148,7 +1149,7 @@ linalg-matmul-128x128-cpu-run:
 		-mattr=+buddyext,+D -float-abi=hard \
 		-o log.o
 	@riscv64-unknown-linux-gnu-g++ log.o -DMATMUL=3 \
-	-DDIALECT=1 performance-test.cpp \
+	-DDIALECT=1 performance-test-simple.cpp \
 	-O2 -static -o a.out -I${INTERFACES}
 	@spike --extension=gemmini pk a.out
 
@@ -1187,9 +1188,9 @@ gemmini-matmul-128x128-gemmini-run:
 		-mattr=+buddyext,+D -float-abi=hard \
 		-o log.o
 	@riscv64-unknown-linux-gnu-g++ log.o -DMATMUL=3 \
-	-DDIALECT=2	performance-test.cpp \
+	-DDIALECT=2	performance-test-simple.cpp \
 	-O2 -static -o a.out -I${INTERFACES}
-	@spike --extension=gemmini pk a.out
+	@spike --extension=gemmini -m16384 ${PK} a.out
 
 linalg-matmul-256x256-gemmini-lower:
 	@${BUDDY_OPT} ./ciface.mlir \
@@ -1230,7 +1231,7 @@ linalg-matmul-256x256-gemmini-run:
 		-mattr=+buddyext,+D -float-abi=hard \
 		-o log.o
 	@riscv64-unknown-linux-gnu-g++ log.o -DMATMUL=4 -DDIALECT=1 \
-	performance-test.cpp -O2 -static -o a.out -I${INTERFACES}
+	performance-test-simple.cpp -O2 -static -o a.out -I${INTERFACES}
 	@spike --extension=gemmini pk a.out
 
 c-matmul-256x256-gemmini-run:
@@ -1291,7 +1292,7 @@ linalg-matmul-256x256-cpu-run:
 		-mattr=+buddyext,+D -float-abi=hard \
 		-o log.o
 	@riscv64-unknown-linux-gnu-g++ log.o -DMATMUL=4 \
-	-DDIALECT=1 performance-test.cpp \
+	-DDIALECT=1 performance-test-simple.cpp \
 	-O2 -static -o a.out -I${INTERFACES}
 	@spike --extension=gemmini pk a.out
 
@@ -1330,7 +1331,7 @@ gemmini-matmul-256x256-gemmini-run:
 		-mattr=+buddyext,+D -float-abi=hard \
 		-o log.o
 	@riscv64-unknown-linux-gnu-g++ log.o -DMATMUL=4 \
-	-DDIALECT=2	performance-test.cpp \
+	-DDIALECT=2	performance-test-simple.cpp \
 	-O2 -static -o a.out -I${INTERFACES}
 	@spike --extension=gemmini pk a.out
 
@@ -1373,7 +1374,7 @@ linalg-matmul-512x512-gemmini-run:
 		-mattr=+buddyext,+D -float-abi=hard \
 		-o log.o
 	@riscv64-unknown-linux-gnu-g++ log.o -DMATMUL=5 -DDIALECT=1 \
-	performance-test.cpp -O2 -static -o a.out -I${INTERFACES}
+	performance-test-simple.cpp -O2 -static -o a.out -I${INTERFACES}
 	@spike --extension=gemmini pk a.out
 
 c-matmul-512x512-gemmini-run:
@@ -1434,7 +1435,7 @@ linalg-matmul-512x512-cpu-run:
 		-mattr=+buddyext,+D -float-abi=hard \
 		-o log.o
 	@riscv64-unknown-linux-gnu-g++ log.o -DMATMUL=5 \
-	-DDIALECT=1 performance-test.cpp \
+	-DDIALECT=1 performance-test-simple.cpp \
 	-O2 -static -o a.out -I${INTERFACES}
 	@spike --extension=gemmini pk a.out
 
@@ -1473,7 +1474,7 @@ gemmini-matmul-512x512-gemmini-run:
 		-mattr=+buddyext,+D -float-abi=hard \
 		-o log.o
 	@riscv64-unknown-linux-gnu-g++ log.o -DMATMUL=5 \
-	-DDIALECT=2	performance-test.cpp \
+	-DDIALECT=2	performance-test-simple.cpp \
 	-O2 -static -o a.out -I${INTERFACES}
 	@spike --extension=gemmini pk a.out
 
@@ -1516,7 +1517,7 @@ linalg-matmul-1024x1024-gemmini-run:
 		-mattr=+buddyext,+D -float-abi=hard \
 		-o log.o
 	@riscv64-unknown-linux-gnu-g++ log.o -DMATMUL=6 -DDIALECT=1 \
-	performance-test.cpp -O2 -static -o a.out -I${INTERFACES}
+	performance-test-simple.cpp -O2 -static -o a.out -I${INTERFACES}
 	@spike --extension=gemmini pk a.out
 
 c-matmul-1024x1024-gemmini-run:
@@ -1577,7 +1578,7 @@ linalg-matmul-1024x1024-cpu-run:
 		-mattr=+buddyext,+D -float-abi=hard \
 		-o log.o
 	@riscv64-unknown-linux-gnu-g++ log.o -DMATMUL=6 \
-	-DDIALECT=1 performance-test.cpp \
+	-DDIALECT=1 performance-test-simple.cpp \
 	-O2 -static -o a.out -I${INTERFACES}
 	@spike --extension=gemmini pk a.out
 
@@ -1616,7 +1617,7 @@ gemmini-matmul-1024x1024-gemmini-run:
 		-mattr=+buddyext,+D -float-abi=hard \
 		-o log.o
 	@riscv64-unknown-linux-gnu-g++ log.o -DMATMUL=6 \
-	-DDIALECT=2	performance-test.cpp \
+	-DDIALECT=2	performance-test-simple.cpp \
 	-O2 -static -o a.out -I${INTERFACES}
 	@spike --extension=gemmini pk a.out
 
@@ -1659,7 +1660,7 @@ linalg-conv-3x3-gemmini-run:
 		-mattr=+buddyext,+D -float-abi=hard \
 		-o log.o
 	@riscv64-unknown-linux-gnu-g++ log.o -DCONV=1 -DDIALECT=1 \
-	performance-test.cpp \
+	performance-test-simple.cpp \
 	-O2 -static -o a.out -I${INTERFACES}
 	@spike --extension=gemmini pk a.out
 
@@ -1721,7 +1722,7 @@ linalg-conv-3x3-cpu-run:
 		-mattr=+buddyext,+D -float-abi=hard \
 		-o log.o
 	@riscv64-unknown-linux-gnu-g++ log.o -DCONV=1 -DDIALECT=1 \
-	performance-test.cpp \
+	performance-test-simple.cpp \
 	-O2 -static -o a.out -I${INTERFACES}
 	@spike --extension=gemmini pk a.out
 
@@ -1760,7 +1761,7 @@ gemmini-conv-3x3-gemmini-run:
 		-mattr=+buddyext,+D -float-abi=hard \
 		-o log.o
 	@riscv64-unknown-linux-gnu-g++ log.o -DCONV=1 \
-	-DDIALECT=2	performance-test.cpp \
+	-DDIALECT=2	performance-test-simple.cpp \
 	-O2 -static -o a.out -I${INTERFACES}
 	@spike --extension=gemmini pk a.out
 
@@ -1803,7 +1804,7 @@ linalg-conv-5x5-gemmini-run:
 		-mattr=+buddyext,+D -float-abi=hard \
 		-o log.o
 	@riscv64-unknown-linux-gnu-g++ log.o -DCONV=2 -DDIALECT=1 \
-	performance-test.cpp \
+	performance-test-simple.cpp \
 	-O2 -static -o a.out -I${INTERFACES}
 	@spike --extension=gemmini pk a.out
 
@@ -1865,7 +1866,7 @@ linalg-conv-5x5-cpu-run:
 		-mattr=+buddyext,+D -float-abi=hard \
 		-o log.o
 	@riscv64-unknown-linux-gnu-g++ log.o -DCONV=2 -DDIALECT=1 \
-	performance-test.cpp \
+	performance-test-simple.cpp \
 	-O2 -static -o a.out -I${INTERFACES}
 	@spike --extension=gemmini pk a.out
 
@@ -1904,7 +1905,7 @@ gemmini-conv-5x5-gemmini-run:
 		-mattr=+buddyext,+D -float-abi=hard \
 		-o log.o
 	@riscv64-unknown-linux-gnu-g++ log.o -DCONV=2 \
-	-DDIALECT=2	performance-test.cpp \
+	-DDIALECT=2	performance-test-simple.cpp \
 	-O2 -static -o a.out -I${INTERFACES}
 	@spike --extension=gemmini pk a.out
 
@@ -1947,7 +1948,7 @@ linalg-conv-7x7-gemmini-run:
 		-mattr=+buddyext,+D -float-abi=hard \
 		-o log.o
 	@riscv64-unknown-linux-gnu-g++ log.o -DCONV=3 -DDIALECT=1 \
-	performance-test.cpp \
+	performance-test-simple.cpp \
 	-O2 -static -o a.out -I${INTERFACES}
 	@spike --extension=gemmini pk a.out
 
@@ -2009,7 +2010,7 @@ linalg-conv-7x7-cpu-run:
 		-mattr=+buddyext,+D -float-abi=hard \
 		-o log.o
 	@riscv64-unknown-linux-gnu-g++ log.o -DCONV=3 -DDIALECT=1 \
-	performance-test.cpp \
+	performance-test-simple.cpp \
 	-O2 -static -o a.out -I${INTERFACES}
 	@spike --extension=gemmini pk a.out
 
@@ -2048,7 +2049,7 @@ gemmini-conv-7x7-gemmini-run:
 		-mattr=+buddyext,+D -float-abi=hard \
 		-o log.o
 	@riscv64-unknown-linux-gnu-g++ log.o -DCONV=3 \
-	-DDIALECT=2	performance-test.cpp \
+	-DDIALECT=2	performance-test-simple.cpp \
 	-O2 -static -o a.out -I${INTERFACES}
 	@spike --extension=gemmini pk a.out
 
@@ -2091,7 +2092,7 @@ linalg-conv-9x9-gemmini-run:
 		-mattr=+buddyext,+D -float-abi=hard \
 		-o log.o
 	@riscv64-unknown-linux-gnu-g++ log.o -DCONV=4 -DDIALECT=1 \
-	performance-test.cpp \
+	performance-test-simple.cpp \
 	-O2 -static -o a.out -I${INTERFACES}
 	@spike --extension=gemmini pk a.out
 
@@ -2153,7 +2154,7 @@ linalg-conv-9x9-cpu-run:
 		-mattr=+buddyext,+D -float-abi=hard \
 		-o log.o
 	@riscv64-unknown-linux-gnu-g++ log.o -DCONV=4 -DDIALECT=1 \
-	performance-test.cpp \
+	performance-test-simple.cpp \
 	-O2 -static -o a.out -I${INTERFACES}
 	@spike --extension=gemmini pk a.out
 
@@ -2192,7 +2193,7 @@ gemmini-conv-9x9-gemmini-run:
 		-mattr=+buddyext,+D -float-abi=hard \
 		-o log.o
 	@riscv64-unknown-linux-gnu-g++ log.o -DCONV=4 \
-	-DDIALECT=2	performance-test.cpp \
+	-DDIALECT=2	performance-test-simple.cpp \
 	-O2 -static -o a.out -I${INTERFACES}
 	@spike --extension=gemmini pk a.out
 
@@ -2235,7 +2236,7 @@ linalg-conv-11x11-gemmini-run:
 		-mattr=+buddyext,+D -float-abi=hard \
 		-o log.o
 	@riscv64-unknown-linux-gnu-g++ log.o -DCONV=5 -DDIALECT=1 \
-	performance-test.cpp \
+	performance-test-simple.cpp \
 	-O2 -static -o a.out -I${INTERFACES}
 	@spike --extension=gemmini pk a.out
 
@@ -2297,7 +2298,7 @@ linalg-conv-11x11-cpu-run:
 		-mattr=+buddyext,+D -float-abi=hard \
 		-o log.o
 	@riscv64-unknown-linux-gnu-g++ log.o -DCONV=5 -DDIALECT=1 \
-	performance-test.cpp \
+	performance-test-simple.cpp \
 	-O2 -static -o a.out -I${INTERFACES}
 	@spike --extension=gemmini pk a.out
 
@@ -2336,9 +2337,9 @@ gemmini-conv-11x11-gemmini-run:
 		-mattr=+buddyext,+D -float-abi=hard \
 		-o log.o
 	@riscv64-unknown-linux-gnu-g++ log.o -DCONV=5 \
-	-DDIALECT=2	performance-test.cpp \
+	-DDIALECT=2	performance-test-simple.cpp \
 	-O2 -static -o a.out -I${INTERFACES}
-	@spike --extension=gemmini pk a.out
+	@spike --extension=gemmini ${PK} a.out
 
 
 linalg-conv-13x13-gemmini-lower:
@@ -2380,9 +2381,9 @@ linalg-conv-13x13-gemmini-run:
 		-mattr=+buddyext,+D -float-abi=hard \
 		-o log.o
 	@riscv64-unknown-linux-gnu-g++ log.o -DCONV=6 -DDIALECT=1 \
-	performance-test.cpp \
+	performance-test-simple.cpp \
 	-O2 -static -o a.out -I${INTERFACES}
-	@spike --extension=gemmini pk a.out
+	@spike --extension=gemmini ${PK} a.out
 
 c-conv-13x13-gemmini-run:
 	@riscv64-unknown-linux-gnu-gcc performance-test.c \
@@ -2442,7 +2443,7 @@ linalg-conv-13x13-cpu-run:
 		-mattr=+buddyext,+D -float-abi=hard \
 		-o log.o
 	@riscv64-unknown-linux-gnu-g++ log.o -DCONV=6 -DDIALECT=1 \
-	performance-test.cpp \
+	performance-test-simple.cpp \
 	-O2 -static -o a.out -I${INTERFACES}
 	@spike --extension=gemmini pk a.out
 
@@ -2481,7 +2482,7 @@ gemmini-conv-13x13-gemmini-run:
 		-mattr=+buddyext,+D -float-abi=hard \
 		-o log.o
 	@riscv64-unknown-linux-gnu-g++ log.o -DCONV=6 \
-	-DDIALECT=2	performance-test.cpp \
+	-DDIALECT=2	performance-test-simple.cpp \
 	-O2 -static -o a.out -I${INTERFACES}
 	@spike --extension=gemmini pk a.out
 
@@ -2489,5 +2490,108 @@ exo-matmul-4-run:
 	@riscv64-unknown-linux-gnu-gcc ./exo-matmul-4.c \
 	-I${RISCV}/../../generators/gemmini/software/gemmini-rocc-tests/include \
 	-I${RISCV}/../../generators/gemmini/software/gemmini-rocc-tests \
-	-O2 -static -o a.out
-	@spike --extension=gemmini pk a.out
+	-O2 -g -static -o a.out
+	@spike --extension=gemmini /opt/riscv/riscv64-unknown-elf/bin/pk a.out
+
+# CI测试目标 - 在spike上测试gemmini基本功能
+ci-test: ci-test-basic ci-test-matmul ci-test-conv ci-test-activation
+	@echo "=========================================="
+	@echo "所有CI测试通过！Gemmini在spike上运行正常"
+	@echo "=========================================="
+
+# 基础功能测试
+ci-test-basic:
+	@echo "运行基础功能测试..."
+	@echo "测试mvin-mvout..."
+	@${BUDDY_OPT} ./mvin-mvout.mlir -lower-gemmini | \
+	${BUDDY_TRANSLATE} --buddy-to-llvmir | \
+	${BUDDY_LLC} -filetype=obj -mtriple=riscv64 \
+		-mattr=+buddyext,+D -float-abi=hard \
+		-o log.o
+	@riscv64-unknown-linux-gnu-gcc log.o -O2 -static -o a.out
+	@spike --extension=gemmini ${PK} a.out > /dev/null 2>&1 && echo "✓ mvin-mvout测试通过" || (echo "✗ mvin-mvout测试失败" && exit 1)
+	
+	@echo "测试matrix-add..."
+	@${BUDDY_OPT} ./matrix-add.mlir -lower-gemmini | \
+	${BUDDY_TRANSLATE} --buddy-to-llvmir | \
+	${BUDDY_LLC} -filetype=obj -mtriple=riscv64 \
+		-mattr=+buddyext,+D -float-abi=hard \
+		-o log.o
+	@riscv64-unknown-linux-gnu-gcc log.o -O2 -static -o a.out
+	@spike --extension=gemmini ${PK} a.out > /dev/null 2>&1 && echo "✓ matrix-add测试通过" || (echo "✗ matrix-add测试失败" && exit 1)
+
+# 矩阵乘法测试
+ci-test-matmul:
+	@echo "运行矩阵乘法测试..."
+	@echo "测试32x32矩阵乘法..."
+	@${BUDDY_OPT} ./ciface.mlir \
+	-llvm-request-c-wrappers \
+	-convert-linalg-to-gemmini \
+	-convert-linalg-to-loops  \
+	-lower-gemmini | \
+	${BUDDY_TRANSLATE} --buddy-to-llvmir | \
+	${BUDDY_LLC} -filetype=obj -mtriple=riscv64 \
+		-mattr=+buddyext,+D -float-abi=hard \
+		-o log.o
+	@riscv64-unknown-linux-gnu-g++ log.o -DMATMUL=1 -DDIALECT=1 \
+	performance-test-simple.cpp -O2 -static -o a.out -I${INTERFACES}
+	@spike --extension=gemmini ${PK} a.out > /dev/null 2>&1 && echo "✓ 32x32矩阵乘法测试通过" || (echo "✗ 32x32矩阵乘法测试失败" && exit 1)
+
+# 卷积测试
+ci-test-conv:
+	@echo "运行卷积测试..."
+	@echo "测试3x3卷积..."
+	@${BUDDY_OPT} ./ciface.mlir \
+	-llvm-request-c-wrappers \
+	-convert-linalg-to-gemmini \
+	-convert-linalg-to-loops  \
+	-lower-gemmini | \
+	${BUDDY_TRANSLATE} --buddy-to-llvmir | \
+	${BUDDY_LLC} -filetype=obj -mtriple=riscv64 \
+		-mattr=+buddyext,+D -float-abi=hard \
+		-o log.o
+	@riscv64-unknown-linux-gnu-g++ log.o -DCONV=1 -DDIALECT=1 \
+	performance-test-simple.cpp -O2 -static -o a.out -I${INTERFACES}
+	@spike --extension=gemmini ${PK} a.out > /dev/null 2>&1 && echo "✓ 3x3卷积测试通过" || (echo "✗ 3x3卷积测试失败" && exit 1)
+
+# 激活函数测试
+ci-test-activation:
+	@echo "运行激活函数测试..."
+	@echo "测试带ReLU的矩阵乘法..."
+	@${BUDDY_OPT} ./tile-matmul-ws-relu.mlir -lower-gemmini | \
+	${BUDDY_TRANSLATE} --buddy-to-llvmir | \
+	${BUDDY_LLC} -filetype=obj -mtriple=riscv64 \
+		-mattr=+buddyext,+D -float-abi=hard \
+		-o log.o
+	@riscv64-unknown-linux-gnu-gcc log.o -O2 -static -o a.out
+	@spike --extension=gemmini ${PK} a.out > /dev/null 2>&1 && echo "✓ ReLU激活函数测试通过" || (echo "✗ ReLU激活函数测试失败" && exit 1)
+
+# 快速CI测试 - 只运行最基本的测试
+ci-test-quick:
+	@echo "运行快速CI测试..."
+	@echo "测试mvin-mvout..."
+	@${BUDDY_OPT} ./mvin-mvout.mlir -lower-gemmini | \
+	${BUDDY_TRANSLATE} --buddy-to-llvmir | \
+	${BUDDY_LLC} -filetype=obj -mtriple=riscv64 \
+		-mattr=+buddyext,+D -float-abi=hard \
+		-o log.o
+	@riscv64-unknown-linux-gnu-gcc log.o -O2 -static -o a.out
+	@spike --extension=gemmini ${PK} a.out > /dev/null 2>&1 && echo "✓ 快速CI测试通过" || (echo "✗ 快速CI测试失败" && exit 1)
+
+# 清理CI测试产生的文件
+ci-clean:
+	@echo "清理CI测试文件..."
+	@rm -f log.o a.out log.mlir log.ll log.s
+	@echo "清理完成"
+
+# 帮助信息
+ci-help:
+	@echo "可用的CI测试命令："
+	@echo "  make ci-test        - 运行完整的CI测试套件"
+	@echo "  make ci-test-quick  - 运行快速CI测试（只测试基本功能）"
+	@echo "  make ci-test-basic  - 测试基础功能（mvin-mvout, matrix-add）"
+	@echo "  make ci-test-matmul - 测试矩阵乘法功能"
+	@echo "  make ci-test-conv   - 测试卷积功能"
+	@echo "  make ci-test-activation - 测试激活函数功能"
+	@echo "  make ci-clean       - 清理CI测试产生的文件"
+	@echo "  make ci-help        - 显示此帮助信息"
