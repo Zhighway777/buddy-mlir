@@ -20,7 +20,7 @@
 
 include "RISCV.td"
 def FeatureBuddyExt
-    : SubtargetFeature<"buddyext", "HasBuddyExt", "true",
+    : SubtargetFeature<"", "HasBuddyExt", "true",
                        "'BuddyExt' (Buddy RISC-V Extension)">;
 def HasBuddyExt : Predicate<"Subtarget->hasBuddyExt()">,
                             AssemblerPredicate<(all_of FeatureBuddyExt),
