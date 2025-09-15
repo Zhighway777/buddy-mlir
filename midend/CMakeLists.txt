@@ -1,5 +1,6 @@
 add_subdirectory(include)
 add_subdirectory(lib)
+add_subdirectory(test)
 
 if(MLIR_ENABLE_BINDINGS_PYTHON)
   include(MLIRDetectPythonEnv)

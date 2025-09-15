@@ -11,6 +11,7 @@ target_link_libraries(buddy-opt
   ${dialect_libs}
   ${conversion_libs}
   ${extension_libs}
+  BuddyCocmh
   MLIROptLib
   CBConvVectorization
   BuddyBud

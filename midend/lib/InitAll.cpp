@@ -26,6 +26,7 @@
 #include "Dialect/Gemmini/GemminiDialect.h"
 #include "Dialect/RVV/RVVDialect.h"
 #include "Dialect/VectorExp/VectorExpDialect.h"
+#include "Dialect/Cocmh/CocmhDialect.h"
 
 namespace mlir {
 namespace buddy {
@@ -55,6 +56,7 @@ void mlir::buddy::registerAllDialects(mlir::DialectRegistry &registry) {
   registry.insert<::buddy::gemmini::GemminiDialect>();
   registry.insert<::buddy::rvv::RVVDialect>();
   registry.insert<::buddy::vector_exp::VectorExpDialect>();
+  registry.insert<::buddy::cocmh::CocmhDialect>();
 }
 
 void mlir::buddy::registerAllPasses() {

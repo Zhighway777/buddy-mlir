@@ -34,6 +34,8 @@
 #include "llvm/Support/SourceMgr.h"
 #include "llvm/Support/ToolOutputFile.h"
 
+#include "Cocmh/CocmhDialect.h"
+#include "Cocmh/CocmhOps.h"
 #include "Bud/BudDialect.h"
 #include "Bud/BudOps.h"
 #include "DAP/DAPDialect.h"
@@ -142,6 +144,7 @@ int main(int argc, char **argv) {
                   buddy::dap::DAPDialect,
                   buddy::rvv::RVVDialect,
                   buddy::vector_exp::VectorExpDialect,
+                  buddy::cocmh::CocmhDialect,
                   buddy::vir::VIRDialect,
                   buddy::gemmini::GemminiDialect>();
   // clang-format on
