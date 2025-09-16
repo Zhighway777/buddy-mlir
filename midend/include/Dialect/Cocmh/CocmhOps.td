@@ -24,11 +24,39 @@
 // CocmhOps.td
 include "Cocmh/CocmhDialect.td"
 include "mlir/IR/OpBase.td"
+include "mlir/Interfaces/InferTypeOpInterface.td"
 
+// RFFTOp
 def Cocmh_RFFTOp : Cocmh_Op<"rfft"> {
   let arguments = (ins AnyRankedOrUnrankedMemRef:$memref);
   let assemblyFormat = [{
     $memref attr-dict `:` type($memref)
+  }];
+}
+
+// // GemmOp
+// def Cocmh_GemmOp : Cocmh_Op<"gemm"> {
+//   let arguments = (ins AnyRankedOrUnrankedMemRef:$A, AnyRankedOrUnrankedMemRef:$B, AnyRankedOrUnrankedMemRef:$C);
+//   let assemblyFormat = [{
+//     $A attr-dict `:` type($A) $B attr-dict `:` type($B) $C attr-dict `:` type($C)
+//   }];
+// }
+
+// CocmhIncrementOp
+def Cocmh_IncOp : Cocmh_Op<"inc", [
+  SameOperandsAndResultType
+]> {
+  let summary = "Increment operation";
+  let description = [{
+    The `inc` operation increments its input operand by one.
+  }];
+
+  let arguments = (ins SignlessIntegerLike:$input);
+  let results   = (outs SignlessIntegerLike:$output);
+
+  // 让 parser 从文本里拿到“结果类型”，从而可构造 $output
+  let assemblyFormat = [{
+    $input attr-dict `:` type($input)
   }];
 }
 

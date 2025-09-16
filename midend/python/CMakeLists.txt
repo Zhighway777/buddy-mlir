@@ -114,6 +114,10 @@ add_mlir_python_common_capi_library(BuddyMLIRPythonCAPI
     MLIRPythonExtension.Core
 )
 
+# Ensure Cocmh dialect implementation is linked so its TypeID and constructor
+# are available when InitAll registers all dialects.
+target_link_libraries(BuddyMLIRPythonCAPI PRIVATE BuddyCocmh)
+
 ################################################################################
 # Instantiation of all Python modules
 ################################################################################

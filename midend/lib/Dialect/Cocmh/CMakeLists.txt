@@ -1,6 +1,7 @@
 add_mlir_dialect_library(BuddyCocmh
   CocmhDialect.cpp
   CocmhOps.cpp
+  CocmhIncrementPass.cpp
   # CocmhTypes.cpp
   # CocmhAttrs.cpp
 
@@ -12,4 +13,7 @@ add_mlir_dialect_library(BuddyCocmh
   LINK_LIBS PUBLIC
     MLIRIR
     MLIRSupport
+    MLIRTransforms
+    MLIRRewrite
+    MLIRArithDialect
 )

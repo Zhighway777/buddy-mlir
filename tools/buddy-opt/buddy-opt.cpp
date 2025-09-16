@@ -88,6 +88,7 @@ void registerMatMulTransposeBVecPass();
 void registerLegalizeShmemOutliningPass();
 void registerVIRToVectorPass();
 void registerLinalgToVIRPass();
+void registerCocmhIncrementPass();
 } // namespace buddy
 } // namespace mlir
 
@@ -95,6 +96,8 @@ int main(int argc, char **argv) {
   // Register all MLIR passes.
   mlir::registerAllPasses();
   mlir::buddy::registerPointwiseConvToGemmPass();
+  // Register Increment Pass.
+  mlir::buddy::registerCocmhIncrementPass();
   // Register Vectorization of Convolution.
   mlir::buddy::registerConvVectorizationPass();
   // Register Vectorization of Pooling.
@@ -137,6 +140,8 @@ int main(int argc, char **argv) {
   // Register all MLIR core dialects.
   registerAllDialects(registry);
   mlir::registerAllExtensions(registry);
+  // mlir::buddy::cocmh::CocmhDialect::registerDialectInContext(registry); // <-- 如果CocmhDialect没有被registerAllDialects注册，需要手动添加
+
   // Register dialects in buddy-mlir project.
   // clang-format off
   registry.insert<buddy::bud::BudDialect,
